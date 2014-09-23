@@ -10,19 +10,15 @@ import logging
 
 try:
     sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../')
-    from bootstrap import Bootstrap
-    from bootstrap import get_bundles
-    from bootstrap import boot
+    from bootstrap.bootstrap import Bootstrap
+    from bootstrap.bootstrap import get_bundles
+    from bootstrap.bootstrap import boot
     from sanji.connection.mockup import Mockup
 except ImportError as e:
-    print os.path.dirname(os.path.realpath(__file__)) + '/../'
-    print sys.path
     print e
     print "Please check the python PATH for import test module. (%s)" \
         % __file__
     exit(1)
-
-dirpath = os.path.dirname(os.path.realpath(__file__))
 
 
 class TestFunctions(unittest.TestCase):
@@ -34,8 +30,9 @@ class TestFunctions(unittest.TestCase):
         self.assertEqual(len(get_bundles(root_path)), 1)
 
     def test_boot(self):
+        dirpath = os.path.dirname(os.path.realpath(__file__))
         options = {
-            "bundle_dir": os.path.normpath(dirpath + "/mock_bundles/bundle_1"),
+            "bundle_dir": os.path.normpath(dirpath + '/mock_bundles/bundle_1'),
             "connection": Mockup(),
         }
         thread, stop_event = boot(**options)
@@ -49,7 +46,6 @@ class TestFunctions(unittest.TestCase):
 class TestBootstrapClass(unittest.TestCase):
 
     def setUp(self):
-        os.putenv("BUNDLE_DIR", dirpath + "/mock_bundles/")
         self.bootstrap = Bootstrap(connection=Mockup())
 
     def tearDown(self):
