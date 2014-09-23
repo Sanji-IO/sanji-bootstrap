@@ -13,8 +13,7 @@ try:
     from sanji.core import Sanji
     from sanji.bundle import Bundle
     from sanji.connection.mqtt import Mqtt
-except ImportError as e:
-    print e
+except ImportError:
     print "Please check the python PATH for import Bootstrap module. (%s)" \
         % __file__
     exit(1)
@@ -68,9 +67,9 @@ class Bootstrap(Sanji):
 
     def init(self,
              bundle_env=os.getenv("BUNDLE_ENV", "debug"),
-             bundle_root_dir=
-             os.getenv("BUNDLE_DIR",
-                       os.path.dirname(__file__) + '/tests/mock_bundles/')):
+             bundle_root_dir=os.getenv("BUNDLE_DIR",
+                                       os.path.normpath(__file__ +
+                                                        '/../../'))):
         self.bundle_root_dir = bundle_root_dir
         self.bundle_env = bundle_env
         self.running_bundle = {}
