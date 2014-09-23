@@ -13,7 +13,8 @@ try:
     from sanji.core import Sanji
     from sanji.bundle import Bundle
     from sanji.connection.mqtt import Mqtt
-except ImportError:
+except ImportError as e:
+    print e
     print "Please check the python PATH for import Bootstrap module. (%s)" \
         % __file__
     exit(1)
