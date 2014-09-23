@@ -1,0 +1,7 @@
+language: python
+python:
+  - "2.7"
+install:
+  - pip install -e "git://git@github.com:Sanji-IO/sanji.git#egg=sanji"
+script:
+  - nosetests
