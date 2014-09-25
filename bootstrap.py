@@ -7,17 +7,9 @@ import imp
 from threading import Thread
 from threading import Event
 
-
-try:
-    # sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../../')
-    from sanji.core import Sanji
-    from sanji.bundle import Bundle
-    from sanji.connection.mqtt import Mqtt
-except ImportError as e:
-    print e
-    print "Please check the python PATH for import Bootstrap module. (%s)" \
-        % __file__
-    exit(1)
+from sanji.core import Sanji
+from sanji.bundle import Bundle
+from sanji.connection.mqtt import Mqtt
 
 logger = logging.getLogger()
 
