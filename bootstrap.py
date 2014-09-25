@@ -115,5 +115,5 @@ if __name__ == '__main__':
     logging.basicConfig(level=0, format=FORMAT)
     logger = logging.getLogger('Bootstrap')
 
-    bootstrap = Bootstrap()
+    bootstrap = Bootstrap(connection=Mqtt())
     bootstrap.start()
