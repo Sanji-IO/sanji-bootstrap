@@ -15,8 +15,7 @@
   "role": "model",
   "resources": [
     {
-      "methods": "get",
-      "resource": "/sanji/bundles"
+      "resource": "/system/sanjikeeper"
     }
   ]
 }
