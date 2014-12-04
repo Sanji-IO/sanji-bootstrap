@@ -20,12 +20,8 @@ BundleMeta = namedtuple(
 
 
 class SanjiKeeper(object):
-    def __init__(self, bundle_env=os.getenv("BUNDLE_ENV", "debug"),
-                 bundle_root_dir=os.getenv
-                 ("BUNDLES_HOME", os.path.dirname(__file__) +
-                  '/tests/mock_bundles/')):
-        self.bundle_root_dir = bundle_root_dir
-        self.bundle_env = bundle_env
+
+    def __init__(self):
         self.running_bundles = {}
         self.bundles = []
 
@@ -119,9 +115,9 @@ class SanjiKeeper(object):
         map(lambda bundle: bundle.thread.join(),
             self.running_bundles.itervalues())
 
-    def start(self):
-        logger.info("Start loading bundles at %s", self.bundle_root_dir)
-        self.bundles = SanjiKeeper.get_bundles(self.bundle_root_dir)
+    def start(self, bundles_home):
+        logger.info("Start loading bundles at %s", bundles_home)
+        self.bundles = SanjiKeeper.get_bundles(bundles_home)
         self.boot_all()
         logger.info("%s bundle config is loaded." % len(self.bundles))
 
@@ -132,7 +128,9 @@ class Index(Sanji):
         self.keeper = SanjiKeeper()
 
     def run(self):
-        self.keeper.start()
+        bundles_home = os.getenv
+        ("BUNDLES_HOME", os.path.dirname(__file__) + '/tests/mock_bundles/')
+        self.keeper.start(bundles_home)
 
     def before_stop(self):
         self.keeper.stop()

@@ -16,7 +16,7 @@ logger = logging.getLogger()
 
 class Mockbundle(Sanji):
 
-    def init(self):
+    def init(self, *args, **kwargs):
         self.message = "Hello Sanji!"
 
     @Route(methods="get", resource="/hellosanji")
