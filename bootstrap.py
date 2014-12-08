@@ -128,8 +128,8 @@ class Index(Sanji):
         self.keeper = SanjiKeeper()
 
     def run(self):
-        bundles_home = os.getenv
-        ("BUNDLES_HOME", os.path.dirname(__file__) + '/tests/mock_bundles/')
+        bundles_home = os.getenv("BUNDLES_HOME", os.path.dirname(__file__) +
+                                 '/tests/mock_bundles/')
         self.keeper.start(bundles_home)
 
     def before_stop(self):
