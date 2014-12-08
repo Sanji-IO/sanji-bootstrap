@@ -65,12 +65,17 @@ class SanjiKeeper(object):
         # load bundle information from json config
         bundle = Bundle(bundle_dir=bundle_dir)
         class_name, ext = os.path.splitext(bundle.profile["main"])
+
+        if class_name == "bootstrap":
+            raise RuntimeError("ignore class: bootstrap")
+        if ext != ".py":
+            raise RuntimeError("ignore none python bundle: %s" % ext)
+
         pyfile = os.path.join(bundle_dir, bundle.profile["main"])
         bundleClass = SanjiKeeper.get_sanji_class(class_name, pyfile)
 
         if bundleClass is None:
-            raise RuntimeError
-            ("Couldn't find Sanji subclass in " + pyfile)
+            raise RuntimeError("Couldn't find Sanji subclass in " + pyfile)
 
         # start the bundle and pass stop_event
         bInstance = bundleClass(stop_event=stop_event, connection=connection)
