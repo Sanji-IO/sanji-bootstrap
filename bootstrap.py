@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
+import sys
 import logging
 import imp
 import inspect
@@ -70,6 +71,10 @@ class SanjiKeeper(object):
             raise RuntimeError("ignore class: bootstrap")
         if ext != ".py":
             raise RuntimeError("ignore none python bundle: %s" % ext)
+
+        # Append bundle path into sys.path
+        sys.path.append(bundle_dir)
+        print(sys.path)
 
         pyfile = os.path.join(bundle_dir, bundle.profile["main"])
         bundleClass = SanjiKeeper.get_sanji_class(class_name, pyfile)
