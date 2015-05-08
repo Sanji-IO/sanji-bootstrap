@@ -4,8 +4,10 @@
 import os
 import sys
 import logging
+import logging.config
 import imp
 import inspect
+import json
 from collections import namedtuple
 from threading import Thread
 from threading import Event
@@ -158,9 +160,10 @@ class Index(Sanji):
                   in self.keeper.running_bundles.itervalues()])
 
 if __name__ == '__main__':
-    FORMAT = '%(asctime)s %(name)s:%(module)s:%(lineno)s %(message)s'
-    logging.getLogger("sh").setLevel(logging.WARNING)
-    logging.basicConfig(level=0, format=FORMAT)
+    with open("config/logger-%s.json" % os.getenv("SANJI_ENV", "debug"),
+              'rt') as f:
+        config = json.load(f)
+        logging.config.dictConfig(config)
     logger = logging.getLogger('Sanji.SanjiKeeper')
     index = Index(connection=Mqtt())
     index.start()
