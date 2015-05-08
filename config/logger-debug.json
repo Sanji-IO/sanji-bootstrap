@@ -19,7 +19,7 @@
             "class": "logging.handlers.RotatingFileHandler",
             "level": "INFO",
             "formatter": "simple",
-            "filename": "info.log",
+            "filename": "/var/log/sanji-info.log",
             "maxBytes": 10485760,
             "backupCount": 20,
             "encoding": "utf8"
@@ -29,7 +29,7 @@
             "class": "logging.handlers.RotatingFileHandler",
             "level": "ERROR",
             "formatter": "simple",
-            "filename": "errors.log",
+            "filename": "/var/log/sanji-errors.log",
             "maxBytes": 10485760,
             "backupCount": 20,
             "encoding": "utf8"
@@ -37,7 +37,7 @@
     },
 
     "loggers": {
-        "Sanji": {
+        "sanji": {
             "level": "DEBUG",
             "handlers": ["console", "info_file_handler", "error_file_handler"],
             "propagate": false
@@ -45,7 +45,7 @@
     },
 
     "root": {
-        "level": "ERROR",
+        "level": "INFO",
         "handlers": ["console", "info_file_handler", "error_file_handler"]
     }
 }

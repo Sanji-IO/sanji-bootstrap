@@ -17,7 +17,8 @@ from sanji.core import Route
 from sanji.bundle import Bundle
 from sanji.connection.mqtt import Mqtt
 
-logger = logging.getLogger()
+logger = logging.getLogger("sanji.bootstrap")
+
 BundleMeta = namedtuple(
     'BundleMeta', 'thread, stop_event, connection, instance')
 
@@ -134,6 +135,11 @@ class SanjiKeeper(object):
             self.running_bundles.itervalues())
 
     def start(self, bundles_home):
+        envs = {}
+        for key, value in os.environ.items():
+            envs[key] = value
+
+        logger.info(json.dumps(envs))
         logger.info("Start loading bundles at %s", bundles_home)
         self.bundles = SanjiKeeper.get_bundles(bundles_home)
         self.boot_all()
@@ -160,10 +166,14 @@ class Index(Sanji):
                   in self.keeper.running_bundles.itervalues()])
 
 if __name__ == '__main__':
-    with open("config/logger-%s.json" % os.getenv("SANJI_ENV", "debug"),
-              'rt') as f:
+    path_root = os.path.abspath(os.path.dirname(__file__))
+    with open(
+        os.path.join(
+            path_root,
+            "config/logger-%s.json" % os.getenv("SANJI_ENV", "debug")),
+            'rt') as f:
         config = json.load(f)
         logging.config.dictConfig(config)
-    logger = logging.getLogger('Sanji.SanjiKeeper')
+
     index = Index(connection=Mqtt())
     index.start()
