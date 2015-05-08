@@ -56,7 +56,13 @@ class SanjiKeeper(object):
         # dynamic load import module via property "main" in bundle config
         module = imp.load_source(class_name.title(), pyfile)
         result = inspect.getmembers(module, predicate)
-        return None if len(result) == 0 else result[0][1]
+
+        for classObj in result:
+            if classObj[0] == 'Sanji':
+                continue
+            return classObj[1]
+
+        return None
 
     def boot(*args, **kwargs):
         bundle_dir = kwargs.get("bundle_dir")
@@ -74,8 +80,6 @@ class SanjiKeeper(object):
 
         # Append bundle path into sys.path
         sys.path.append(bundle_dir)
-        print(sys.path)
-
         pyfile = os.path.join(bundle_dir, bundle.profile["main"])
         bundleClass = SanjiKeeper.get_sanji_class(class_name, pyfile)
 
@@ -83,7 +87,9 @@ class SanjiKeeper(object):
             raise RuntimeError("Couldn't find Sanji subclass in " + pyfile)
 
         # start the bundle and pass stop_event
-        bInstance = bundleClass(stop_event=stop_event, connection=connection)
+        bInstance = bundleClass(
+            bundle=bundle, stop_event=stop_event, connection=connection)
+
         thread = Thread(target=bInstance.start)
         thread.daemon = True
         thread.start()
@@ -152,9 +158,9 @@ class Index(Sanji):
                   in self.keeper.running_bundles.itervalues()])
 
 if __name__ == '__main__':
-    FORMAT = '%(asctime)s - %(levelname)s - %(lineno)s - %(message)s'
+    FORMAT = '%(asctime)s %(name)s:%(module)s:%(lineno)s %(message)s'
+    logging.getLogger("sh").setLevel(logging.WARNING)
     logging.basicConfig(level=0, format=FORMAT)
-    logger = logging.getLogger('SanjiKeeper')
-
+    logger = logging.getLogger('Sanji.SanjiKeeper')
     index = Index(connection=Mqtt())
     index.start()
