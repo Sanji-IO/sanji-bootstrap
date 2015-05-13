@@ -27,10 +27,9 @@ class SanjiKeeper(object):
 
     def __init__(self):
         self.running_bundles = {}
-        self.bundles = []
 
     @staticmethod
-    def get_bundles(dir_path):
+    def get_bundle_paths(dir_path):
         dirs = []
         for file in os.listdir(dir_path):
             if file == "bundle.json":
@@ -40,12 +39,24 @@ class SanjiKeeper(object):
                 dirs.append(child_dir_path)
 
         # if this dir has no exist bundle.json file, then go deeper
-        bundles = []
+        bundle_paths = []
         for child_dir_path in dirs:
-            child_bundles = SanjiKeeper.get_bundles(child_dir_path)
+            child_bundles = SanjiKeeper.get_bundle_paths(child_dir_path)
             if len(child_bundles) > 0:
                 # concat two list
-                bundles = bundles + child_bundles
+                bundle_paths = bundle_paths + child_bundles
+
+        return bundle_paths
+
+    @staticmethod
+    def get_bundles(bundle_paths):
+        """
+        Load all bundle.json from given bundle_paths
+        Return dict() key=path, value=Bundle instance
+        """
+        bundles = {}
+        for path in bundle_paths:
+            bundles[path] = Bundle(bundle_dir=path)
 
         return bundles
 
@@ -67,13 +78,19 @@ class SanjiKeeper(object):
 
         return None
 
+    @staticmethod
+    def sort_bundles(bundles):
+        def key_func(bundlePath):
+            return bundles[bundlePath].profile["priority"]
+
+        return sorted(bundles, key=key_func)
+
     def boot(*args, **kwargs):
+        bundle = kwargs.get("bundle")
         bundle_dir = kwargs.get("bundle_dir")
         stop_event = kwargs.get("stop_event", Event())
         connection = kwargs.get("connection", Mqtt())
 
-        # load bundle information from json config
-        bundle = Bundle(bundle_dir=bundle_dir)
         class_name, ext = os.path.splitext(bundle.profile["main"])
 
         if class_name == "bootstrap":
@@ -97,26 +114,33 @@ class SanjiKeeper(object):
         thread.daemon = True
         thread.start()
 
+        if bundle.profile.get("concurrent", True) is False:
+            logger.debug("Waitting for none concurrent bundle: %s" %
+                         bundle.profile["name"])
+            bInstance.is_ready.wait(timeout=30)
+
         return BundleMeta(
             thread, stop_event, connection, bInstance)
 
-    def boot_all(self, connection_class=Mqtt):
+    def boot_all(self, bundles, bundle_sequence, connection_class=Mqtt):
         bundle_count = 0
-        for bundle in self.bundles:
-            if self.running_bundles.get(bundle, None) is not None:
-                logger.info("Skip booting bundle from [%s]..." % bundle)
+        for bundle_path in bundle_sequence:
+            if self.running_bundles.get(bundle_path, None) is not None:
+                logger.info("Skip booting bundle from [%s]..." % bundle_path)
                 continue
-            connection = connection_class()
 
+            connection = connection_class()
+            logger.info("Boot bundle from [%s]..." % bundle_path)
             try:
-                self.running_bundles[bundle] = self.boot(
-                    bundle_dir=bundle, connection=connection)
+                self.running_bundles[bundle_path] = self.boot(
+                    bundle=bundles[bundle_path],
+                    bundle_dir=bundle_path,
+                    connection=connection)
             except Exception as e:
-                logger.info(e)
+                logger.info(str(e))
                 continue
 
             bundle_count = bundle_count + 1
-            logger.info("Boot bundle from [%s]..." % bundle)
 
         logger.info("Waitting for all bundles...")
         bundle_timeout = 60
@@ -141,9 +165,16 @@ class SanjiKeeper(object):
 
         logger.info(json.dumps(envs))
         logger.info("Start loading bundles at %s", bundles_home)
-        self.bundles = SanjiKeeper.get_bundles(bundles_home)
-        self.boot_all()
-        logger.info("%s bundle config is loaded." % len(self.bundles))
+
+        # Scan all bundle.json
+        bundle_paths = SanjiKeeper.get_bundle_paths(bundles_home)
+        # Load all bunlde.json and create Bundle instance
+        bundles = SanjiKeeper.get_bundles(bundle_paths)
+        # Sort bundle using priority in bundle.json
+        sorted_bundle_paths = SanjiKeeper.sort_bundles(bundles)
+
+        self.boot_all(bundles=bundles, bundle_sequence=sorted_bundle_paths)
+        logger.info("%s bundle config is loaded." % len(bundles))
 
 
 class Index(Sanji):

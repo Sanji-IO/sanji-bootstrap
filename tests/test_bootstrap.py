@@ -16,6 +16,7 @@ try:
     from bootstrap import SanjiKeeper
     from bootstrap import BundleMeta
     from sanji.connection.mockup import Mockup
+    from sanji.bundle import Bundle
 except ImportError as e:
     print "Please check the python PATH for import test module. (%s)" \
         % __file__
@@ -34,16 +35,23 @@ class TestSanjiKeeperClass(unittest.TestCase):
         self.sanjikeeper.stop()
         self.sanjikeeper = None
 
-    def test_get_bundles(self):
+    def test_get_bundle_paths(self):
         root_path = os.path.dirname(os.path.realpath(__file__)) + \
             '/mock_bundles/'
         root_path = os.path.normpath(root_path)
-        self.assertEqual(len(self.sanjikeeper.get_bundles(root_path)), 1)
+        self.assertEqual(len(SanjiKeeper.get_bundle_paths(root_path)), 1)
+
+    def test_get_bundles(self):
+        root_path = os.path.dirname(os.path.realpath(__file__)) + \
+            '/mock_bundles/bundle_1'
+        root_path = os.path.normpath(root_path)
+        self.assertEqual(len(SanjiKeeper.get_bundles([root_path])), 1)
 
     @patch("bootstrap.Thread")
     def test_boot(self, Thread):
         Thread.return_value = Mock()
         options = {
+            "bundle": Bundle(dirpath + "/mock_bundles/bundle_1"),
             "bundle_dir": os.path.normpath(dirpath + "/mock_bundles/bundle_1"),
             "connection": Mockup(),
             "stop_event": Event()
@@ -53,9 +61,15 @@ class TestSanjiKeeperClass(unittest.TestCase):
 
     @patch("bootstrap.SanjiKeeper.boot")
     def test_boot_all(self, boot):
+        bundle_path = dirpath + "/mock_bundles/bundle_1"
         boot.return_value = BundleMeta
         (None, Event().set(), None, Mock(is_ready=Event().set()))
-        self.sanjikeeper.boot_all(Mockup)
+        self.sanjikeeper.boot_all(
+            bundles={
+                bundle_path: Bundle(bundle_path)
+            },
+            bundle_sequence=[],
+            connection_class=Mockup)
 
 
 if __name__ == "__main__":
