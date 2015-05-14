@@ -3,7 +3,7 @@
     "disable_existing_loggers": false,
     "formatters": {
         "simple": {
-            "format": "%(asctime)s %(name)s:%(module)s:%(lineno)s %(message)s"
+            "format": "%(asctime)s %(levelno)s %(name)s:%(module)s:%(lineno)s %(message)s"
         }
     },
 
@@ -19,7 +19,7 @@
             "class": "logging.handlers.RotatingFileHandler",
             "level": "INFO",
             "formatter": "simple",
-            "filename": "info.log",
+            "filename": "sanji-info.log",
             "maxBytes": 10485760,
             "backupCount": 20,
             "encoding": "utf8"
@@ -29,7 +29,7 @@
             "class": "logging.handlers.RotatingFileHandler",
             "level": "ERROR",
             "formatter": "simple",
-            "filename": "errors.log",
+            "filename": "sanji-errors.log",
             "maxBytes": 10485760,
             "backupCount": 20,
             "encoding": "utf8"
@@ -37,7 +37,7 @@
     },
 
     "loggers": {
-        "Sanji": {
+        "sanji": {
             "level": "DEBUG",
             "handlers": ["console", "info_file_handler", "error_file_handler"],
             "propagate": false
@@ -45,7 +45,7 @@
     },
 
     "root": {
-        "level": "ERROR",
+        "level": "WARNING",
         "handlers": ["console", "info_file_handler", "error_file_handler"]
     }
 }
