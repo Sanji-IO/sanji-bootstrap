@@ -6,7 +6,7 @@
             "format": "%(asctime)s %(levelname)s:%(module)s:%(lineno)s %(message)s"
         },
         "syslog": {
-            "format": "%(levelname)s%(name)s:%(module)s:%(lineno)s %(message)s"
+            "format": "%(levelname)s:%(name)s:%(module)s:%(lineno)s %(message)s"
         }
     },
 
