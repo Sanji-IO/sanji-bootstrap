@@ -3,7 +3,10 @@
     "disable_existing_loggers": false,
     "formatters": {
         "simple": {
-            "format": "%(asctime)s %(name)s:%(module)s:%(lineno)s %(message)s"
+            "format": "%(asctime)s %(levelname)s:%(module)s:%(lineno)s %(message)s"
+        },
+        "syslog": {
+            "format": "%(levelname)s%(name)s:%(module)s:%(lineno)s %(message)s"
         }
     },
 
@@ -11,7 +14,7 @@
         "console": {
             "class": "logging.StreamHandler",
             "level": "DEBUG",
-            "formatter": "simple",
+            "formatter": "syslog",
             "stream": "ext://sys.stdout"
         },
 
@@ -38,7 +41,7 @@
 
     "loggers": {
         "sanji": {
-            "level": "INFO",
+            "level": "DEBUG",
             "handlers": ["console", "info_file_handler", "error_file_handler"],
             "propagate": false
         }
