@@ -201,7 +201,7 @@ if __name__ == '__main__':
     with open(
         os.path.join(
             path_root,
-            "config/logger-%s.json" % os.getenv("SANJI_ENV", "debug")),
+            "config/logger-%s.json" % os.getenv("BUNDLE_ENV", "debug")),
             'rt') as f:
         config = json.load(f)
         logging.config.dictConfig(config)
