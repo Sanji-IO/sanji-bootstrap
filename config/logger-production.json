@@ -24,7 +24,7 @@
             "formatter": "simple",
             "filename": "/var/log/sanji-info.log",
             "maxBytes": 10485760,
-            "backupCount": 20,
+            "backupCount": 5,
             "encoding": "utf8"
         },
 
@@ -34,7 +34,7 @@
             "formatter": "simple",
             "filename": "/var/log/sanji-errors.log",
             "maxBytes": 10485760,
-            "backupCount": 20,
+            "backupCount": 5,
             "encoding": "utf8"
         }
     },
@@ -42,7 +42,7 @@
     "loggers": {
         "sanji": {
             "level": "DEBUG",
-            "handlers": ["console", "info_file_handler", "error_file_handler"],
+            "handlers": ["info_file_handler", "error_file_handler"],
             "propagate": false
         }
     },
