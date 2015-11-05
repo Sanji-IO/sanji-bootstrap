@@ -11,6 +11,7 @@ import json
 from collections import namedtuple
 from threading import Thread
 from threading import Event
+from time import sleep
 
 from sanji.core import Sanji
 from sanji.core import Route
@@ -22,11 +23,14 @@ _logger = logging.getLogger("sanji.bootstrap")
 BundleMeta = namedtuple(
     'BundleMeta', 'thread, stop_event, connection, instance')
 
+DEFAULT_BUNDLE_BOOT_TIMEOUT = 600
+
 
 class SanjiKeeper(object):
 
     def __init__(self):
         self.running_bundles = {}
+        self.is_booted = False
 
     @staticmethod
     def get_bundle_paths(dir_path):
@@ -94,9 +98,9 @@ class SanjiKeeper(object):
         class_name, ext = os.path.splitext(bundle.profile["main"])
 
         if class_name == "bootstrap":
-            raise RuntimeError("ignore class: bootstrap")
+            raise RuntimeError("Ignore class: bootstrap")
         if ext != ".py":
-            raise RuntimeError("ignore none python bundle: %s" % ext)
+            raise RuntimeError("Ignore none python bundle: %s" % ext)
 
         # Append bundle path into sys.path
         sys.path.append(bundle_dir)
@@ -107,6 +111,8 @@ class SanjiKeeper(object):
             raise RuntimeError("Couldn't find Sanji subclass in " + pyfile)
 
         # start the bundle and pass stop_event
+        # Note: Here may block by broken class instance init()
+        #       Currently, global bootstrap watchdog will handles.
         bInstance = bundleClass(
             bundle=bundle, stop_event=stop_event, connection=connection)
 
@@ -172,15 +178,28 @@ class SanjiKeeper(object):
         bundles = SanjiKeeper.get_bundles(bundle_paths)
         # Sort bundle using priority in bundle.json
         sorted_bundle_paths = SanjiKeeper.sort_bundles(bundles)
-
+        _logger.info("%s bundle configs are loaded." % len(bundles))
         self.boot_all(bundles=bundles, bundle_sequence=sorted_bundle_paths)
-        _logger.info("%s bundle config is loaded." % len(bundles))
+        self.is_booted = True
+        _logger.info("Boot all done.")
+
+
+def watchdog(keeper):
+    sleep(10)
+    if keeper.is_booted is False:
+        _logger.warning("Boot all timeout. Service restarting...")
+        os.execlp("service", "service", "uc8100-mxcloud-cg", "restart")
+
+    _logger.info("Watchdog has been destroyed.")
 
 
 class Index(Sanji):
 
     def init(self, *args, **kwargs):
         self.keeper = SanjiKeeper()
+        watchdog_thread = Thread(target=watchdog, args=[self.keeper])
+        watchdog_thread.daemon = True
+        watchdog_thread.start()
 
     def run(self):
         bundles_home = os.getenv("BUNDLES_HOME", os.path.dirname(__file__) +
@@ -201,10 +220,14 @@ if __name__ == '__main__':
     with open(
         os.path.join(
             path_root,
-            "config/_logger-%s.json" % os.getenv("BUNDLE_ENV", "debug")),
+            "config/logger-%s.json" % os.getenv("BUNDLE_ENV", "debug")),
             'rt') as f:
         config = json.load(f)
         logging.config.dictConfig(config)
-
-    index = Index(connection=Mqtt())
-    index.start()
+    try:
+        index = Index(connection=Mqtt())
+        index.start()
+    except Exception as e:
+        _logger.error(str(e))
+        _logger.warning("Bootstrap crashed. Service restarting...")
+        os.execlp("service", "service", "uc8100-mxcloud-cg", "restart")
