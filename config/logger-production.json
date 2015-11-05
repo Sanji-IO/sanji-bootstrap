@@ -3,7 +3,7 @@
     "disable_existing_loggers": false,
     "formatters": {
         "simple": {
-            "format": "%(asctime)s %(levelname)s:%(module)s:%(lineno)s %(message)s"
+            "format": "%(asctime)s %(levelname)s:%(name)s:%(module)s:%(lineno)s %(message)s"
         },
         "syslog": {
             "format": "%(levelname)s:%(name)s:%(module)s:%(lineno)s %(message)s"
