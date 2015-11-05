@@ -17,7 +17,7 @@ from sanji.core import Route
 from sanji.bundle import Bundle
 from sanji.connection.mqtt import Mqtt
 
-logger = logging.getLogger("sanji.bootstrap")
+_logger = logging.getLogger("sanji.bootstrap")
 
 BundleMeta = namedtuple(
     'BundleMeta', 'thread, stop_event, connection, instance')
@@ -115,8 +115,8 @@ class SanjiKeeper(object):
         thread.start()
 
         if bundle.profile.get("concurrent", True) is False:
-            logger.debug("Waitting for none concurrent bundle: %s" %
-                         bundle.profile["name"])
+            _logger.debug("Waitting for none concurrent bundle: %s" %
+                          bundle.profile["name"])
             bInstance.is_ready.wait(timeout=30)
 
         return BundleMeta(
@@ -126,31 +126,31 @@ class SanjiKeeper(object):
         bundle_count = 0
         for bundle_path in bundle_sequence:
             if self.running_bundles.get(bundle_path, None) is not None:
-                logger.info("Skip booting bundle from [%s]..." % bundle_path)
+                _logger.info("Skip booting bundle from [%s]..." % bundle_path)
                 continue
 
             connection = connection_class()
-            logger.info("Boot bundle from [%s]..." % bundle_path)
+            _logger.info("Boot bundle from [%s]..." % bundle_path)
             try:
                 self.running_bundles[bundle_path] = self.boot(
                     bundle=bundles[bundle_path],
                     bundle_dir=bundle_path,
                     connection=connection)
             except Exception as e:
-                logger.info(str(e))
+                _logger.info(str(e))
                 continue
 
             bundle_count = bundle_count + 1
 
-        logger.info("Waitting for all bundles...")
+        _logger.info("Waitting for all bundles...")
         bundle_timeout = 60
         for bundleName, meta in self.running_bundles.iteritems():
             if not meta.instance.is_ready.wait(timeout=bundle_timeout):
                 bundle_timeout = 0
                 bundle_count = bundle_count - 1
-                logger.info("Bundle %s register timeout" % (bundleName,))
+                _logger.info("Bundle %s register timeout" % (bundleName,))
 
-        logger.info("Total: %s bundles registered." % bundle_count)
+        _logger.info("Total: %s bundles registered." % bundle_count)
 
     def stop(self):
         map(lambda bundle: bundle.stop_event.set(),
@@ -163,8 +163,8 @@ class SanjiKeeper(object):
         for key, value in os.environ.items():
             envs[key] = value
 
-        logger.info(json.dumps(envs))
-        logger.info("Start loading bundles at %s", bundles_home)
+        _logger.info(json.dumps(envs))
+        _logger.info("Start loading bundles at %s", bundles_home)
 
         # Scan all bundle.json
         bundle_paths = SanjiKeeper.get_bundle_paths(bundles_home)
@@ -174,7 +174,7 @@ class SanjiKeeper(object):
         sorted_bundle_paths = SanjiKeeper.sort_bundles(bundles)
 
         self.boot_all(bundles=bundles, bundle_sequence=sorted_bundle_paths)
-        logger.info("%s bundle config is loaded." % len(bundles))
+        _logger.info("%s bundle config is loaded." % len(bundles))
 
 
 class Index(Sanji):
@@ -184,7 +184,7 @@ class Index(Sanji):
 
     def run(self):
         bundles_home = os.getenv("BUNDLES_HOME", os.path.dirname(__file__) +
-                                 '/tests/mock_bundles/')
+                                 "/tests/mock_bundles/")
         self.keeper.start(bundles_home)
 
     def before_stop(self):
@@ -201,7 +201,7 @@ if __name__ == '__main__':
     with open(
         os.path.join(
             path_root,
-            "config/logger-%s.json" % os.getenv("BUNDLE_ENV", "debug")),
+            "config/_logger-%s.json" % os.getenv("BUNDLE_ENV", "debug")),
             'rt') as f:
         config = json.load(f)
         logging.config.dictConfig(config)
