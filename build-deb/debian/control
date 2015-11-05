@@ -1,0 +1,18 @@
+Source: sanji-bundle-bootstrap
+Priority: extra
+Maintainer: Zack YL Shih <ZackYL.Shih@moxa.com>
+Build-Depends: debhelper (>= 8.0.0)
+Build-Depends-Indep: python (>= 2.7)
+Standards-Version: 3.9.3
+Section: libs
+Homepage: http://www.moxa.com
+#Vcs-Git: git@github.com:Sanji-IO/sanji-bootstrap.git
+#Vcs-Browser: https://github.com/Sanji-IO/sanji-bootstrap
+X-Python-Version: >= 2.5
+
+Package: sanji-bundle-bootstrap
+Section: libs
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, python2.7, python-pip
+Description: Boopstrap is a bundle who takes care of every one.
+
