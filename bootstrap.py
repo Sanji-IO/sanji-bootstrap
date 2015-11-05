@@ -185,7 +185,7 @@ class SanjiKeeper(object):
 
 
 def watchdog(keeper):
-    sleep(10)
+    sleep(DEFAULT_BUNDLE_BOOT_TIMEOUT)
     if keeper.is_booted is False:
         _logger.warning("Boot all timeout. Service restarting...")
         os.execlp("service", "service", "uc8100-mxcloud-cg", "restart")
