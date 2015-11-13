@@ -1,3 +1,9 @@
+sanji-bundle-bootstrap (0.9.5-1) unstable; urgency=low
+
+  * Fix wrong sleep time.
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Thu, 05 Nov 2015 18:02:09 +0800
+
 sanji-bundle-bootstrap (0.9.4-1) unstable; urgency=low
 
   * Add watchdog
