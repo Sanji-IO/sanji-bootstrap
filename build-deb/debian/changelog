@@ -1,3 +1,9 @@
+sanji-bundle-bootstrap (0.9.6-1) unstable; urgency=low
+
+  * Add a bundle name as class prefix.
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Tue, 17 Nov 2015 10:33:44 +0800
+
 sanji-bundle-bootstrap (0.9.5-1) unstable; urgency=low
 
   * Fix wrong sleep time.

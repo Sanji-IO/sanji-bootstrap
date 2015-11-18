@@ -72,7 +72,7 @@ class SanjiKeeper(object):
                 issubclass(member, Sanji)
 
         # dynamic load import module via property "main" in bundle config
-        module = imp.load_source(class_name.title(), pyfile)
+        module = imp.load_source(class_name, pyfile)
         result = inspect.getmembers(module, predicate)
 
         for classObj in result:
@@ -95,9 +95,9 @@ class SanjiKeeper(object):
         stop_event = kwargs.get("stop_event", Event())
         connection = kwargs.get("connection", Mqtt())
 
-        class_name, ext = os.path.splitext(bundle.profile["main"])
+        main_name, ext = os.path.splitext(bundle.profile["main"])
 
-        if class_name == "bootstrap":
+        if main_name == "bootstrap":
             raise RuntimeError("Ignore class: bootstrap")
         if ext != ".py":
             raise RuntimeError("Ignore none python bundle: %s" % ext)
@@ -105,7 +105,8 @@ class SanjiKeeper(object):
         # Append bundle path into sys.path
         sys.path.append(bundle_dir)
         pyfile = os.path.join(bundle_dir, bundle.profile["main"])
-        bundleClass = SanjiKeeper.get_sanji_class(class_name, pyfile)
+        bundle_class_name = "SanjiBundle_%s" % (bundle.profile["name"])
+        bundleClass = SanjiKeeper.get_sanji_class(bundle_class_name, pyfile)
 
         if bundleClass is None:
             raise RuntimeError("Couldn't find Sanji subclass in " + pyfile)
