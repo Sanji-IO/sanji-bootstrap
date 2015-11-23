@@ -1,3 +1,9 @@
+sanji-bundle-bootstrap (0.10.0-1) unstable; urgency=low
+
+  * Add feature: select mode.
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Mon, 23 Nov 2015 11:02:25 +0800
+
 sanji-bundle-bootstrap (0.9.6-1) unstable; urgency=low
 
   * Add a bundle name as class prefix.
