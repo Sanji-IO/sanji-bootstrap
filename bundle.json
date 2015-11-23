@@ -16,6 +16,10 @@
   "resources": [
     {
       "resource": "/system/sanjikeeper"
+    },
+    {
+      "methods": ["get", "put"],
+      "resource": "/system/mode"
     }
   ]
 }

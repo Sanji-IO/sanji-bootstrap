@@ -1,0 +1,8 @@
+{
+    "cellular-router": {
+        "omittedBundleNames": ["modbus", "logprofile"]
+    },
+    "modbus-application": {
+        "omittedBundleNames": ["relay"]
+    }
+}

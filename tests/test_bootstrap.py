@@ -47,6 +47,13 @@ class TestSanjiKeeperClass(unittest.TestCase):
         root_path = os.path.normpath(root_path)
         self.assertEqual(len(SanjiKeeper.get_bundles([root_path])), 1)
 
+    def test_get_bundles_omit(self):
+        root_path = os.path.dirname(os.path.realpath(__file__)) + \
+            '/mock_bundles/bundle_1'
+        root_path = os.path.normpath(root_path)
+        self.assertEqual(
+            len(SanjiKeeper.get_bundles([root_path], ["Mockbundle"])), 0)
+
     @patch("bootstrap.Thread")
     def test_boot(self, Thread):
         Thread.return_value = Mock()
