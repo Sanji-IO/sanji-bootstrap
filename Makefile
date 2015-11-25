@@ -17,7 +17,7 @@ TARGET_FILES = \
 	__init__.py \
 	bootstrap.py \
 	data/bootstrap.json.factory \
-	config/model.json \
+	config/mode.json \
 	config/logger-debug.json \
 	config/logger-production.json
 DIST_FILES= \
