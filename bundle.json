@@ -1,9 +1,9 @@
 {
   "name": "bootstrap",
-  "version": "0.9.6",
+  "version": "0.10.0",
   "author": "Zack YL Shih",
   "email": "ZackYL.Shih@moxa.com",
-  "description": "Boopstrap is a bundle who takes care of every one.",
+  "description": "Boopstrap is a bundle who takes care of every bundles.",
   "license": "MOXA",
   "main": "bootstrap.py",
   "argument": "",
@@ -16,6 +16,10 @@
   "resources": [
     {
       "resource": "/system/sanjikeeper"
+    },
+    {
+      "methods": ["get", "put"],
+      "resource": "/system/mode"
     }
   ]
 }
