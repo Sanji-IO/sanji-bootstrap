@@ -1,3 +1,9 @@
+sanji-bundle-bootstrap (0.10.2-1) unstable; urgency=low
+
+  * Fix typo.
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Wed, 25 Nov 2015 16:21:15 +0800
+
 sanji-bundle-bootstrap (0.10.1-1) unstable; urgency=low
 
   * Add missing files.
