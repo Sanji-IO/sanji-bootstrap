@@ -6,7 +6,7 @@
             "format": "%(asctime)s %(levelname)s:%(name)s:%(lineno)s %(message)s"
         },
         "syslog": {
-            "format": "%(levelname)s:%(name)s:%(module)s:%(lineno)s %(message)s"
+            "format": "%(levelname)s:%(name)s:%(lineno)s %(message)s"
         }
     },
 
@@ -36,19 +36,27 @@
             "maxBytes": 10485760,
             "backupCount": 5,
             "encoding": "utf8"
+        },
+
+        "syslog_handler": {
+            "class": "logging.handlers.SysLogHandler",
+            "level": "INFO",
+            "formatter": "syslog",
+            "address": "/dev/log"
         }
+
     },
 
     "loggers": {
         "sanji": {
             "level": "DEBUG",
-            "handlers": ["info_file_handler", "error_file_handler"],
+            "handlers": ["syslog_handler"],
             "propagate": false
         }
     },
 
     "root": {
         "level": "WARNING",
-        "handlers": ["info_file_handler", "error_file_handler"]
+        "handlers": ["syslog_handler"]
     }
 }
