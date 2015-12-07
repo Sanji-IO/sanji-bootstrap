@@ -1,3 +1,9 @@
+sanji-bundle-bootstrap (0.10.3-1) unstable; urgency=low
+
+  * Change production log to syslog.
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Mon, 07 Dec 2015 18:59:22 +0800
+
 sanji-bundle-bootstrap (0.10.2-1) unstable; urgency=low
 
   * Fix typo.
