@@ -1,3 +1,9 @@
+sanji-bundle-bootstrap (0.10.4-1) unstable; urgency=low
+
+  * Change syslog from device node to udp socket. 
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Mon, 14 Dec 2015 13:07:58 +0800
+
 sanji-bundle-bootstrap (0.10.3-1) unstable; urgency=low
 
   * Change production log to syslog.
