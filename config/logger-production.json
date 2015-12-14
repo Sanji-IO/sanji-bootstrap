@@ -42,7 +42,7 @@
             "class": "logging.handlers.SysLogHandler",
             "level": "INFO",
             "formatter": "syslog",
-            "address": "/dev/log"
+            "address": ["localhost", 514]
         }
 
     },
