@@ -1,3 +1,39 @@
+sanji-bundle-bootstrap (0.10.4-1) unstable; urgency=low
+
+  * Change syslog from device node to udp socket. 
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Mon, 14 Dec 2015 13:07:58 +0800
+
+sanji-bundle-bootstrap (0.10.3-1) unstable; urgency=low
+
+  * Change production log to syslog.
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Mon, 07 Dec 2015 18:59:22 +0800
+
+sanji-bundle-bootstrap (0.10.2-1) unstable; urgency=low
+
+  * Fix typo.
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Wed, 25 Nov 2015 16:21:15 +0800
+
+sanji-bundle-bootstrap (0.10.1-1) unstable; urgency=low
+
+  * Add missing files.
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Wed, 25 Nov 2015 16:15:15 +0800
+
+sanji-bundle-bootstrap (0.10.0-1) unstable; urgency=low
+
+  * Add feature: select mode.
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Mon, 23 Nov 2015 11:02:25 +0800
+
+sanji-bundle-bootstrap (0.9.6-1) unstable; urgency=low
+
+  * Add a bundle name as class prefix.
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Tue, 17 Nov 2015 10:33:44 +0800
+
 sanji-bundle-bootstrap (0.9.5-1) unstable; urgency=low
 
   * Fix wrong sleep time.

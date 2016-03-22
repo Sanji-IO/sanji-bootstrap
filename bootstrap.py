@@ -12,9 +12,11 @@ from collections import namedtuple
 from threading import Thread
 from threading import Event
 from time import sleep
+from voluptuous import Schema, REMOVE_EXTRA, Any, All, Length
 
 from sanji.core import Sanji
 from sanji.core import Route
+from sanji.model_initiator import ModelInitiator
 from sanji.bundle import Bundle
 from sanji.connection.mqtt import Mqtt
 
@@ -28,7 +30,7 @@ DEFAULT_BUNDLE_BOOT_TIMEOUT = 600
 
 class SanjiKeeper(object):
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.running_bundles = {}
         self.is_booted = False
 
@@ -53,14 +55,21 @@ class SanjiKeeper(object):
         return bundle_paths
 
     @staticmethod
-    def get_bundles(bundle_paths):
+    def get_bundles(bundle_paths, omitted_bundle_names=[]):
         """
         Load all bundle.json from given bundle_paths
         Return dict() key=path, value=Bundle instance
         """
         bundles = {}
         for path in bundle_paths:
-            bundles[path] = Bundle(bundle_dir=path)
+            bundle = Bundle(bundle_dir=path)
+            if bundle.profile["name"] in omitted_bundle_names:
+                _logger.debug(
+                    "Bundle [%s] has been omitted by mode config" %
+                    (bundle.profile["name"]))
+                continue
+
+            bundles[path] = bundle
 
         return bundles
 
@@ -72,7 +81,7 @@ class SanjiKeeper(object):
                 issubclass(member, Sanji)
 
         # dynamic load import module via property "main" in bundle config
-        module = imp.load_source(class_name.title(), pyfile)
+        module = imp.load_source(class_name, pyfile)
         result = inspect.getmembers(module, predicate)
 
         for classObj in result:
@@ -95,9 +104,9 @@ class SanjiKeeper(object):
         stop_event = kwargs.get("stop_event", Event())
         connection = kwargs.get("connection", Mqtt())
 
-        class_name, ext = os.path.splitext(bundle.profile["main"])
+        main_name, ext = os.path.splitext(bundle.profile["main"])
 
-        if class_name == "bootstrap":
+        if main_name == "bootstrap":
             raise RuntimeError("Ignore class: bootstrap")
         if ext != ".py":
             raise RuntimeError("Ignore none python bundle: %s" % ext)
@@ -105,7 +114,8 @@ class SanjiKeeper(object):
         # Append bundle path into sys.path
         sys.path.append(bundle_dir)
         pyfile = os.path.join(bundle_dir, bundle.profile["main"])
-        bundleClass = SanjiKeeper.get_sanji_class(class_name, pyfile)
+        bundle_class_name = "SanjiBundle_%s" % (bundle.profile["name"])
+        bundleClass = SanjiKeeper.get_sanji_class(bundle_class_name, pyfile)
 
         if bundleClass is None:
             raise RuntimeError("Couldn't find Sanji subclass in " + pyfile)
@@ -164,7 +174,7 @@ class SanjiKeeper(object):
         map(lambda bundle: bundle.thread.join(),
             self.running_bundles.itervalues())
 
-    def start(self, bundles_home):
+    def start(self, bundles_home, omitted_bundle_names=[]):
         envs = {}
         for key, value in os.environ.items():
             envs[key] = value
@@ -174,8 +184,11 @@ class SanjiKeeper(object):
 
         # Scan all bundle.json
         bundle_paths = SanjiKeeper.get_bundle_paths(bundles_home)
+
         # Load all bunlde.json and create Bundle instance
-        bundles = SanjiKeeper.get_bundles(bundle_paths)
+        bundles = SanjiKeeper.get_bundles(
+            bundle_paths, omitted_bundle_names=omitted_bundle_names)
+
         # Sort bundle using priority in bundle.json
         sorted_bundle_paths = SanjiKeeper.sort_bundles(bundles)
         _logger.info("%s bundle configs are loaded." % len(bundles))
@@ -193,27 +206,80 @@ def watchdog(keeper):
     _logger.info("Watchdog has been destroyed.")
 
 
+def load_mode_config(path):
+    """Load mode config from pre-defined json file"""
+    with open(os.path.join(path, "config", "mode.json")) as f:
+        mode = json.load(f)
+
+    return mode
+
+
+_SYSTEM_MODE_SCHEMA = Schema({
+    "enableMode": All(Any(str, unicode), Length(min=1))
+}, extra=REMOVE_EXTRA)
+
+
 class Index(Sanji):
 
     def init(self, *args, **kwargs):
+        self.path_root = os.path.abspath(os.path.dirname(__file__))
+        self.model = ModelInitiator("bootstrap", self.path_root)
+        self.modes_config = load_mode_config(self.path_root)
         self.keeper = SanjiKeeper()
+
+    def start_keeper(self):
+        bundles_home = os.getenv(
+            "BUNDLES_HOME", os.path.dirname(__file__) +
+            "/tests/mock_bundles/")
+        _logger.info("enableMode: %s" % self.model.db["enableMode"])
         watchdog_thread = Thread(target=watchdog, args=[self.keeper])
         watchdog_thread.daemon = True
         watchdog_thread.start()
+        self.keeper.start(
+            bundles_home,
+            self.modes_config[self.model.db["enableMode"]].get(
+                "omittedBundleNames", []))
 
     def run(self):
-        bundles_home = os.getenv("BUNDLES_HOME", os.path.dirname(__file__) +
-                                 "/tests/mock_bundles/")
-        self.keeper.start(bundles_home)
+        if self.model.db["enableMode"] not in self.modes_config:
+            _logger.info("enableMode is not set. Waitting...")
+            return
+
+        self.start_keeper()
 
     def before_stop(self):
-        self.keeper.stop()
+        if self.keeper:
+            self.keeper.stop()
 
     @Route(resource="/system/sanjikeeper", methods="get")
     def get(self, message, response):
         response(
             data=[meta.instance.bundle.profile for meta
                   in self.keeper.running_bundles.itervalues()])
+
+    @Route(resource="/system/mode", methods="get")
+    def get_system_mode(self, message, response):
+        response(data=self.model.db)
+
+    @Route(resource="/system/mode", methods="put")
+    def put_system_mode(
+            self, message, response, schema=_SYSTEM_MODE_SCHEMA):
+        mode_name = message.data["enableMode"]
+        if mode_name not in self.modes_config:
+            response(code=400, data={"message": "Mode is not exist."})
+            return
+
+        if self.model.db["enableMode"] != "none":
+            response(
+                code=400,
+                data={"message":
+                      "Can't change system mode. Please reset to default."})
+            return
+
+        self.model.db["enableMode"] = mode_name
+        self.model.save_db()
+        self.start_keeper()
+        response(data=self.model.db)
 
 if __name__ == '__main__':
     path_root = os.path.abspath(os.path.dirname(__file__))
