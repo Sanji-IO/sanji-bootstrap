@@ -42,7 +42,7 @@ clean:
 distclean: clean
 
 pylint:
-	flake8 -v --exclude=.git,__init__.py .
+	flake8 -v --ignore=E402 --exclude=.git,__init__.py .
 test:
 	nosetests --with-coverage --cover-erase --cover-package=$(NAME) -v
 
