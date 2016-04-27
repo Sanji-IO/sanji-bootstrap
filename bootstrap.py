@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+# Patch threading, queue _time with monotonic
+from monotonic import monotonic
+import threading
+threading._time = monotonic
+import Queue
+Queue._time = monotonic
 
 import os
 import sys
