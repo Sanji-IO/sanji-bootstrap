@@ -3,7 +3,7 @@
   "version": "0.10.5",
   "author": "Zack YL Shih",
   "email": "ZackYL.Shih@moxa.com",
-  "description": "Boopstrap is a bundle who takes care of every bundles.",
+  "description": "A bundle used to select the application mode and init other bundles",
   "license": "MOXA",
   "main": "bootstrap.py",
   "argument": "",
