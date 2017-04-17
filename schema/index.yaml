@@ -1,0 +1,66 @@
+swagger: '2.0'
+
+info:
+  title: Bootstrap API
+  description: Bootstraping all bundles
+  version: '0.0.1'
+
+schemes:
+- http
+- https
+
+produces:
+- application/json
+
+paths:
+  /system/mode:
+    put:
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Mode'
+      description: Set mode of machine. (only for the first time, you have to reset to factory settings)
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/Mode'
+          examples:
+            {
+              "application/json": {
+                $ref: '#/definitions/Mode/example'
+              }
+            }
+    get:
+      description: Get current mode
+      responses:
+        200:
+          description: success
+          schema:
+            $ref: '#/definitions/Mode'
+          examples:
+            {
+              "application/json": {
+                $ref: '#/definitions/Mode/example'
+              }
+            }
+
+definitions:
+  Mode:
+    description: Mode configuration
+    type: object
+    required:
+    - enableMode
+    properties:
+      enableMode:
+        description: Mode of machine
+        type: string
+        enum:
+        - cellular-router
+        - modbus-application
+    example:
+      {
+        "enableMode": "cellular-router"
+      }
