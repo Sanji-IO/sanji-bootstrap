@@ -1,3 +1,9 @@
+sanji-bundle-bootstrap (0.10.6-1) unstable; urgency=low
+
+  * fix: incorrect service name.
+
+ -- Zack YL Shih <ZackYL.Shih@moxa.com>  Thu, 29 Jun 2017 14:57:13 +0800
+
 sanji-bundle-bootstrap (0.10.5-1) unstable; urgency=low
 
   * Add monkey patch for threading, Queue time.
