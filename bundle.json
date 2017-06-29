@@ -1,6 +1,6 @@
 {
   "name": "bootstrap",
-  "version": "0.10.5",
+  "version": "0.10.6",
   "author": "Zack YL Shih",
   "email": "ZackYL.Shih@moxa.com",
   "description": "A bundle used to select the application mode and init other bundles",
