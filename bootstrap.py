@@ -207,7 +207,12 @@ def watchdog(keeper):
     sleep(DEFAULT_BUNDLE_BOOT_TIMEOUT)
     if keeper.is_booted is False:
         _logger.warning("Boot all timeout. Service restarting...")
-        os.execlp("service", "service", "uc8100-mxcloud-cg", "restart")
+        if os.path.isfile("/etc/init.d/uc8100-mxcloud-cg"):
+            os.execlp("service", "service", "uc8100-mxcloud-cg", "restart")
+        elif os.path.isfile("/etc/init.d/uc8100me-mxcloud-cg"):
+            os.execlp("service", "service", "uc8100me-mxcloud-cg", "restart")
+        else:
+            print("bootstrap panic!")
 
     _logger.info("Watchdog has been destroyed.")
 
