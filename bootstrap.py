@@ -292,7 +292,8 @@ class Index(Sanji):
         self.start_keeper()
         response(data=self.model.db)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     path_root = os.path.abspath(os.path.dirname(__file__))
     with open(
         os.path.join(
